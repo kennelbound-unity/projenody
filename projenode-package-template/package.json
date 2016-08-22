@@ -2,17 +2,6 @@
   "name": "projenode-package-template",
   "version": "1.0.0",
   "description": "Basic Unity package",
-  "keywords": [
-    "unity3dpackage"
-  ],
   "author": "Sam Alston",
-  "license": "MIT",
-  "config": {
-    "projenode": {
-      "type": "package"
-    }
-  },
-  "dependencies": {
-    "projenode": "file:///Users/samalsto/personal/projenode"
-  }
+  "license": "MIT"
 }
