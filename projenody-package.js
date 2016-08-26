@@ -2,7 +2,7 @@
 
 class ProjenodyPackage {
     constructor(config) {
-        console.log("Creating package object from " + JSON.stringify(config));
+        console.log("Creating package object from " + config.name + " packaqge.json");
 
         this.name = config.name;
         // Folder under package root that contains the assets

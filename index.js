@@ -7,6 +7,7 @@ var jsonfile = require('jsonfile');
 var utils = require('./projenody-utils');
 var ProjenodyPackage = require('./projenody-package');
 var program = require("commander");
+var npm = require('npm-programmatic');
 
 program
     .version(module.exports.version)
@@ -31,20 +32,20 @@ program.command('init')
     .option('-p, --project-settings-folder <folder>', 'Folder within project root where we can find the project settings for the project.  Defaults to "ProjectSettings"')
     .description('Generates the Projenody config files.')
     .action(function (options) {
+        options = options || {}
         jsonfile.readFile(process.cwd() + '/package.json', function (err, obj) {
             if (err) {
                 console.log("No package.json file exists.");
 
-                var npm = require('npm');
                 npm.load({}, function (err, npm) {
                     npm.commands.init([], function (err, res) {
                         var pkg = require(process.cwd() + '/package.json');
                         console.log("Pulled pkg " + JSON.stringify(pkg));
-                        writeProjenodyPackage(extend(options, pkg.name));
+                        writeProjenodyPackage(extend(options, {name: pkg.name}));
                     });
                 });
             } else {
-                writeProjenodyPackage(obj.package);
+                writeProjenodyPackage(obj);
             }
         });
     });
@@ -52,16 +53,13 @@ program.command('init')
 program.command('add <pkg>')
     .description("Adds a dependency to the projenody package.")
     .action(function (pkg, options) {
-        var npm = require('npm');
-        npm.load({}, function (err, npm) {
-            npm.commands.install([pkg], function (err, res) {
-                if (err) {
-                    console.error("Error resolving dependencies.  Specific error: %s", JSON.stringify(err));
-                } else {
-                    console.log("Finished resolving.")
-                }
+        npm.install([pkg], {save: true, cwd: process.cwd(), output: true})
+            .then(function () {
+                console.log('Successfully added %s and its dependencies.', pkg)
+            })
+            .catch(function () {
+                console.log('Unable to install the dependecy.  Please check the path you are using.');
             });
-        });
     });
 
 program.command('resolve')
