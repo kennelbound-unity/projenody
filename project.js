@@ -2,6 +2,7 @@
 
 var fs = require('fs');
 var util = require('./projenody-utils');
+var logger = require('./projenody-log');
 
 class ProjenodyProject {
     constructor(folder) {
@@ -26,8 +27,8 @@ class ProjenodyProject {
     }
 
     createUnityProject() {
-        if(!isRoot) {
-            console.error("Cannot create unity project for non-root package.");
+        if (!isRoot) {
+            logger.error("Cannot create unity project for non-root package.");
         }
         util.checkDirectory()
     }
@@ -44,7 +45,7 @@ project.readConfig = function () {
         return jsonfile.readFileSync(file).project;
     } catch (e) {
         // projeny file doesn't exist.  Quit out with instructions on how to create it.
-        console.error("Could not find valid projenody.json.  Please use prjn init to create.");
+        logger.error("Could not find valid projenody.json.  Please use prjn init to create.");
         process.exit(1);
     }
 };
@@ -54,7 +55,7 @@ project.updateConfig = function (config) {
 };
 
 project.createUnityProjectFolder = function (config) {
-    if (config.verbose) console.info("Creating project folder %s", config.name);
+    logger.start("Creating project folder " + config.name);
 
     var fs = require('fs');
     var dir = config.name;
@@ -62,6 +63,7 @@ project.createUnityProjectFolder = function (config) {
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
     }
+    logger.end();
 };
 
 project.createLocalAssetsSymlink = function (config) {
@@ -71,24 +73,16 @@ project.createLocalAssetsSymlink = function (config) {
     // this.getDependencies(require(folder + '/package.json'), alreadyLoaded, {});
     require('fs').readdir(folder + "/node_modules", function (error, files) {
         if (error) {
-            console.log("Error finding the node_modules directory.  Error message: %s", JSON.stringify(error));
+            logger.error("Error finding the node_modules directory.  Error message: " + error);
             process.exit(1);
         }
-
-        for (var folder of files.filter(function (x) {
-            return x != ".bin"
-        })) {
-
-        }
-
-        console.log("Found files: " + JSON.stringify(files));
     });
 
     console.log("Found alreadyLoaded of " + JSON.stringify(alreadyLoaded));
 
     // Get dependency graph
     // For each dependency
-    // Check for projenody file.  If not there then log and continue.
+    // Check for projenody file.  If not there then logger and continue.
     // If there, then create symlink using the info
 
     // TODO: Handle dependency changes
