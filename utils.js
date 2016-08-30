@@ -10,7 +10,7 @@ var mkdirp = require('mkdirp');
 function runSimple(cmd, callback) {
     logger.debug('Executing the command `' + cmd + '`');
     try {
-        var stdout = exec(cmd, [], { stdio: 'inherit' });
+        var stdout = exec(cmd, [], {stdio: 'inherit'});
         if (callback) callback(false, stdout);
     }
     catch (e) {

@@ -6,17 +6,14 @@
   "keywords": [
     "unity3d"
   ],
+  "bin": {
+    "projenody": "projenody.js"
+  },
   "author": "Sam Alston",
   "license": "MIT",
-  "bin": {
-    "projenody": "index.js"
-  },
   "dependencies": {
-    "commander": "^2.9.0",
     "jsonfile": "^2.3.1",
-    "madge": "^0.6.0",
     "mkdirp": "^0.5.1",
-    "npm-programmatic": "0.0.5",
     "pkginfo": "^0.4.0",
     "winston": "^2.2.0"
   }
