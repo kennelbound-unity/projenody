@@ -48,27 +48,27 @@ function createLink(source, target) {
     source = path.normalize(source);
     target = path.normalize(target);
 
-    logger.debug('Checking link between source ' + source + " and target " + target);
+    // Create the parent folder if needed
+    logger.debug("Checking target's parent folder: " + path.normalize(target + '/../'));
+    checkDirectorySync(path.normalize(target + '/..'));
 
-    // checkDirectorySync(target);
+    logger.debug('Checking link between source ' + source + " and target " + target);
 
     if (fs.existsSync(target) && isSymlinkSync(target)) {
         logger.debug("Target already exists and is a symlink.");
     } else {
         logger.debug("Attempting to link " + source + " to " + target + " on platform " + os.platform());
 
-        // fs.symlinkSync(source, target);
 
         switch (os.platform()) {
             case 'windows':
             case 'win32':
             case 'win64':
                 runSimple('mklink /J ' + target + ' ' + source);
-                // fs.symlink(target, source, 'junction');
                 break;
             default:
                 runSimple('ln -s ' + source + ' ' + target);
-            // fs.symlink(source, target);
+                break;
         }
 
         logger.debug("Linked " + source + " to " + target);
@@ -76,7 +76,7 @@ function createLink(source, target) {
 }
 
 function packageProjenodyFile(pkg) {
-    return path.normalize(packageFolder() + '/projenody.json');
+    return path.normalize(packageFolder(pkg) + '/projenody.json');
 }
 
 function packageFolder(pkg) {
