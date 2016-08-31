@@ -2,12 +2,8 @@
   "name": "projenody",
   "version": "1.0.0",
   "description": "A nodejs package manager for Unity3d, based in concept on Projeny.",
-  "main": "index.js",
-  "keywords": [
-    "unity3d"
-  ],
-  "bin": {
-    "projenody": "projenody.js"
+  "engines": {
+    "node": ">=4.0.0"
   },
   "author": "Sam Alston",
   "license": "MIT",
