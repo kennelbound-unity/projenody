@@ -23,7 +23,7 @@ function getProjenodyPackage(directory) {
     try {
         var p = require(path.normalize(directory + '/projenody.json'));
         var npmPackage = require(path.normalize(directory + '/package.json'));
-        p.name = npmPackage.name;
+        p.name = p.name || npmPackage.name;
         return new ProjenodyPackage(p);
     } catch (e) {
         return null;
@@ -54,14 +54,14 @@ function linkProjenodyPackage(pkg) {
 
     logger.debug("Attempting to create the symlinks.");
 
-    utils.checkDirectory(ProjenodyPackage.unityProjectAssetsPath);
+    utils.checkDirectory(pkg.unityProjectAssetsPath);
     // utils.checkDirectory(ProjenodyPackage.unityProjectSettingsPath);
 
     // Create the directories
     utils.createLink(pkg.packageAssetPath, pkg.unityAssetsPath);
-    utils.createLink(pkg.packageProjectSettingsPath, ProjenodyPackage.unityProjectSettingsPath);
+    utils.createLink(pkg.packageProjectSettingsPath, pkg.unityProjectSettingsPath);
 
-    linkDirectories(ProjenodyPackage.packageModules);
+    linkDirectories(pkg.packageBasePath);
 
     logger.debug('Done creating symlinks.');
 }
@@ -80,7 +80,7 @@ function linkDirectories(directory) {
             linkDirectories(directories);
 
             for (var dir of directories) {
-                dir = path.normalize(ProjenodyPackage.packageModules + '/' + dir);
+                dir = path.normalize(pkg.packageModules + '/' + dir);
                 logger.debug("Looking at directory: " + dir);
 
                 var ppkg = getProjenodyPackage(dir);
@@ -90,15 +90,10 @@ function linkDirectories(directory) {
                 }
 
                 logger.debug("Examining " + ppkg.name + " with asset path " + ppkg.packageAssetPath);
-                utils.createLink(ppkg.packageAssetPath, ppkg.unityAssetsPath);
+                utils.createLink(ppkg.packageAssetPath, pkg.unityProjectAssetsPath + '/' + ppkg.targetFolder);
 
                 linkDirectories(dir);
             }
         }
     }
 }
-
-program.parse(process.argv);
-
-// if program was called with no arguments, show help.
-if (program.args.length === 0) program.help();

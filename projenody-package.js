@@ -1,29 +1,34 @@
 'use strict';
 
 var path = require('path');
-var logger = require('./projenody-log');
+var logger = require('./log');
 
 class ProjenodyPackage {
     constructor(config) {
         logger.debug("Creating package object from " + config.name + " package.json");
-
-        this.name = config.name;
+        this.name = config.name
         // Folder under package root that contains the assets
         this.assetsFolder = config.assetsFolder || 'Assets';
         // Folder under /Assets to put the files.
         this.targetFolder = config.targetFolder || ('/' + this.name);
         // Folder under package root that contains the project settings.  Optional
         this.projectSettingsFolder = config.projectSettingsFolder || null;
+        // Target project folder
+        this.projectTargetFolder = config.projectTargetFolder || (this.name + '.unity');
         // Whether this is the main project
         this.isMain = config.isMain;
     }
 
     get packageBasePath() {
-        return path.normalize(this.isMain ? process.cwd() : ProjenodyPackage.packageModules + '/' + this.name);
+        return path.normalize(this.isMain ? process.cwd() : (process.cwd() + '/node_modules/' + this.name));
     }
 
-    static get packageModules() {
-        return path.normalize(process.cwd() + '/node_modules');
+    get projectTarget() {
+        return this.projectTargetFolder;
+    }
+
+    get packageModules() {
+        return path.normalize(this.packageBasePath + '/node_modules');
     }
 
     get packageAssetPath() {
@@ -38,16 +43,20 @@ class ProjenodyPackage {
         return path.normalize(this.packageBasePath + '/projenody.json');
     }
 
+    get unityProjectPath() {
+        return path.normalize(this.packageBasePath + '/' + this.projectTarget);
+    }
+
+    get unityProjectAssetsPath() {
+        return path.normalize(this.unityProjectPath + '/Assets');
+    }
+
+    get unityProjectSettingsPath() {
+        return path.normalize(this.unityProjectPath + '/ProjectSettings');
+    }
+
     get unityAssetsPath() {
-        return path.normalize(ProjenodyPackage.unityProjectAssetsPath + '/' + this.targetFolder);
-    }
-
-    static get unityProjectAssetsPath() {
-        return path.normalize(process.cwd() + '/target.project/Assets');
-    }
-
-    static get unityProjectSettingsPath() {
-        return path.normalize(process.cwd() + '/target.project/ProjectSettings');
+        return path.normalize(this.unityProjectAssetsPath + '/' + this.targetFolder);
     }
 }
 

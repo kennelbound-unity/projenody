@@ -4,7 +4,7 @@ var fs = require('fs');
 var exec = require('child_process').execSync;
 var path = require('path');
 var os = require('os');
-var logger = require('./projenody-log');
+var logger = require('./log');
 var mkdirp = require('mkdirp');
 
 function runSimple(cmd, callback) {
