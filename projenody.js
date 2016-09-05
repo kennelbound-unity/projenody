@@ -10,13 +10,20 @@ var utils = require('./utils');
 var ProjenodyPackage = require('./projenody-package');
 
 function writeProjenodyPackage(pkg) {
-    jsonfile.writeFile(path.normalize(pkg.packageProjenodyFile), pkg, function (error) {
-        if (error) {
-            logger.error("Could not write projenody.json file.  Error: " + JSON.stringify(error));
-            process.exit(1);
-        }
-        logger.info("Generated the projenody file at " + process.cwd());
-    });
+    var isMain = pkg.isMain;
+    try {
+        delete pkg.isMain;
+        jsonfile.writeFile(path.normalize(pkg.packageProjenodyFile), pkg, function (error) {
+            if (error) {
+                logger.error("Could not write projenody.json file.  Error: " + JSON.stringify(error));
+                process.exit(1);
+            }
+            logger.info("Generated the projenody file at " + process.cwd());
+        });
+    }
+    finally {
+        pkg.isMain = isMain;
+    }
 }
 
 function getProjenodyPackage(directory) {
@@ -38,7 +45,6 @@ function initProjenodyPackage(pkg) {
     try {
         var obj = jsonfile.readFileSync(path.normalize(process.cwd() + '/package.json'));
         pkg = new ProjenodyPackage({name: obj.name});
-        pkg.isMain = true;
         writeProjenodyPackage(pkg);
     } catch (e) {
         logger.error('Failed to create projenody.json file.');
@@ -67,6 +73,7 @@ function linkProjenodyPackage(pkg) {
 }
 
 var pkg = getProjenodyPackage(process.cwd());
+pkg.isMain = true;
 initProjenodyPackage(pkg);
 linkProjenodyPackage(pkg);
 
@@ -85,12 +92,14 @@ function linkDirectories(directory) {
 
                 var ppkg = getProjenodyPackage(dir);
                 if (!ppkg) {
+                    // TODO: Check for an Assets folder in the root.
                     logger.debug("Found non-projenody package.  Leaving it.");
                     continue;
                 }
 
                 logger.debug("Examining " + ppkg.name + " with asset path " + ppkg.packageAssetPath);
-                utils.createLink(ppkg.packageAssetPath, pkg.unityProjectAssetsPath + '/' + ppkg.targetFolder);
+                var pluginOverride = pkg.pluginOverrides.indexOf(ppkg.name) > -1;
+                utils.createLink(ppkg.packageAssetPath, pkg.unityProjectAssetsPath + '/' + (pluginOverride ? 'Plugins/' : '').toString() + ppkg.targetFolder);
 
                 linkDirectories(dir);
             }

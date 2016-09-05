@@ -6,7 +6,7 @@ var logger = require('./log');
 class ProjenodyPackage {
     constructor(config) {
         logger.debug("Creating package object from " + config.name + " package.json");
-        this.name = config.name
+        this.name = config.name;
         // Folder under package root that contains the assets
         this.assetsFolder = config.assetsFolder || 'Assets';
         // Folder under /Assets to put the files.
@@ -16,6 +16,9 @@ class ProjenodyPackage {
         // Target project folder
         this.projectTargetFolder = config.projectTargetFolder || (this.name + '.unity');
         // Whether this is the main project
+        this.applicationPackage = config.applicationPackage;
+        this.pluginPackage = config.pluginPackage;
+        this.pluginOverrides = config.pluginOverrides || [];
         this.isMain = config.isMain;
     }
 
@@ -56,7 +59,7 @@ class ProjenodyPackage {
     }
 
     get unityAssetsPath() {
-        return path.normalize(this.unityProjectAssetsPath + '/' + this.targetFolder);
+        return path.normalize(this.unityProjectAssetsPath + '/' + (this.pluginPackage ? 'Plugins/' : '').toString() + this.targetFolder);
     }
 }
 
