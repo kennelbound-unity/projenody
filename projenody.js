@@ -73,8 +73,8 @@ function linkProjenodyPackage(pkg) {
 }
 
 var pkg = getProjenodyPackage(process.cwd());
-pkg.isMain = true;
 initProjenodyPackage(pkg);
+pkg.isMain = true;
 linkProjenodyPackage(pkg);
 
 function linkDirectories(directory) {
