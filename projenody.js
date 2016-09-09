@@ -9,11 +9,12 @@ var logger = require('./log');
 var utils = require('./utils');
 var ProjenodyPackage = require('./projenody-package');
 
-function writeProjenodyPackage(pkg) {
-    var isMain = pkg.isMain;
+function writeProjenodyPackage(ppkg) {
+    var isMain = ppkg.isMain;
     try {
-        delete pkg.isMain;
-        jsonfile.writeFile(path.normalize(pkg.packageProjenodyFile), pkg, function (error) {
+        var path = path.normalize(ppkg.packageProjenodyFile);
+        delete ppkg.isMain;
+        jsonfile.writeFile(path, ppkg, function (error) {
             if (error) {
                 logger.error("Could not write projenody.json file.  Error: " + JSON.stringify(error));
                 process.exit(1);
@@ -22,7 +23,7 @@ function writeProjenodyPackage(pkg) {
         });
     }
     finally {
-        pkg.isMain = isMain;
+        ppkg.isMain = isMain;
     }
 }
 
@@ -37,8 +38,8 @@ function getProjenodyPackage(directory) {
     }
 }
 
-function initProjenodyPackage(pkg) {
-    if (pkg) {
+function initProjenodyPackage(ppkg) {
+    if (ppkg) {
         return;
     }
 
@@ -51,23 +52,22 @@ function initProjenodyPackage(pkg) {
     }
 }
 
-function linkProjenodyPackage(pkg) {
-    if (!pkg) {
+function linkProjenodyPackage(ppkg) {
+    if (!ppkg) {
         logger.info('Cannot link from null package.');
         return;
     }
     logger.info("Checking existing symlinks and updating as needed...");
-
     logger.debug("Attempting to create the symlinks.");
 
-    utils.checkDirectory(pkg.unityProjectAssetsPath);
+    utils.checkDirectory(ppkg.unityProjectAssetsPath);
     // utils.checkDirectory(ProjenodyPackage.unityProjectSettingsPath);
 
     // Create the directories
-    utils.createLink(pkg.packageAssetPath, pkg.unityAssetsPath);
-    utils.createLink(pkg.packageProjectSettingsPath, pkg.unityProjectSettingsPath);
+    utils.createLink(ppkg.packageAssetPath, ppkg.unityAssetsPath);
+    utils.createLink(ppkg.packageProjectSettingsPath, ppkg.unityProjectSettingsPath);
 
-    linkDirectories(pkg.packageBasePath);
+    linkDirectories(ppkg.packageBasePath);
 
     logger.debug('Done creating symlinks.');
 }
